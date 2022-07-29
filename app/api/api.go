@@ -8,4 +8,5 @@ import (
 func Init(r *gin.Engine) {
 	r.GET("/", handlers.HelloServer)
 	r.GET("/machines", handlers.ListMachines)
+	r.GET("/machines/:machine", handlers.GetNetworkTopologyData)
 }

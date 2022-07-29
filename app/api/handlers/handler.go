@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"github.com/ahmadateya/flotta-webapp-backend/pkg/s3"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -30,5 +31,39 @@ func ListMachines(c *gin.Context) {
 				"machines": machines,
 			},
 		},
+	})
+}
+
+func GetNetworkTopologyData(c *gin.Context) {
+	machine := c.Param("machine")
+
+	// get network topology data from S3
+	client := s3.InitS3Client()
+	networkTopologyFilename := client.GetMostRecentObjectNameInFolder(machine)
+
+	// if the machine does not have any network data yet, return error
+	if networkTopologyFilename == "" {
+		c.JSON(http.StatusNotFound, gin.H{
+			"errors": []map[string]interface{}{
+				{
+					"status": http.StatusNotFound,
+					"title":  "no network topology data found",
+					"detail": "no network topology data found for machine " + machine,
+				},
+			},
+		})
+		return
+	}
+
+	// read contents of network topology file from S3
+	objContent := client.ReadObject(networkTopologyFilename)
+
+	// parse objContent data to JSON
+	var jsonMap map[string]interface{}
+	json.Unmarshal([]byte(objContent), &jsonMap)
+
+	// return response
+	c.JSON(http.StatusOK, gin.H{
+		"data": jsonMap,
 	})
 }
