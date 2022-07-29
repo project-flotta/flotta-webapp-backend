@@ -14,32 +14,32 @@ func HelloServer(c *gin.Context) {
 	})
 }
 
-func ListMachines(c *gin.Context) {
+func ListDevices(c *gin.Context) {
 	// get machine names from S3 top level folders
 	client := s3.InitS3Client()
-	machines := client.ListTopLevelFolders()
+	devices := client.ListTopLevelFolders()
 
 	// trim slash from machine names
-	for i, machine := range machines {
-		machines[i] = strings.TrimSuffix(machine, "/")
+	for i, device := range devices {
+		devices[i] = strings.TrimSuffix(device, "/")
 	}
 
 	// return response
 	c.JSON(http.StatusOK, gin.H{
 		"data": []map[string]interface{}{
 			{
-				"machines": machines,
+				"devices": devices,
 			},
 		},
 	})
 }
 
 func GetNetworkTopologyData(c *gin.Context) {
-	machine := c.Param("machine")
+	device := c.Param("device")
 
 	// get network topology data from S3
 	client := s3.InitS3Client()
-	networkTopologyFilename := client.GetMostRecentObjectNameInFolder(machine)
+	networkTopologyFilename := client.GetMostRecentObjectNameInFolder(device)
 
 	// if the machine does not have any network data yet, return error
 	if networkTopologyFilename == "" {
@@ -48,7 +48,7 @@ func GetNetworkTopologyData(c *gin.Context) {
 				{
 					"status": http.StatusNotFound,
 					"title":  "no network topology data found",
-					"detail": "no network topology data found for machine " + machine,
+					"detail": "no network topology data found for device " + device,
 				},
 			},
 		})
