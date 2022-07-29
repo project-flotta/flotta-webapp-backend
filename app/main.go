@@ -22,10 +22,8 @@ func main() {
 	// Start the server
 	router := gin.New()
 	api.Init(router)
-	err = router.Run(cfg.Server.Port)
+	err = router.Run(fmt.Sprintf("%s:%s", cfg.Server.Host, cfg.Server.Port))
 	if err != nil {
 		fmt.Printf("Error Starting the server %v\n", err.Error())
 	}
 }
-
-// commit "using Gin framework instead of Mux and pure http pkg"

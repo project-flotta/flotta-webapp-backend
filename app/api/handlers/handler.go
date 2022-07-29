@@ -1,11 +1,10 @@
 package handlers
 
 import (
+	"github.com/ahmadateya/flotta-webapp-backend/pkg/s3"
 	"github.com/gin-gonic/gin"
-	"log"
 	"net/http"
-	"os"
-	"time"
+	"strings"
 )
 
 func HelloServer(c *gin.Context) {
@@ -14,19 +13,22 @@ func HelloServer(c *gin.Context) {
 	})
 }
 
-func ListMachines() {
+func ListMachines(c *gin.Context) {
+	// get machine names from S3 top level folders
+	client := s3.InitS3Client()
+	machines := client.ListTopLevelFolders()
 
-}
-
-func getNetworkData() {
-	// Open the file.
-	f, _ := os.Open("./go_data/parent.json")
-
-	resp, err := http.Post("http://127.0.0.1:5000/v1/parent", "application/json", f)
-
-	if err != nil {
-		log.Fatalf("An Error Occured %v", err)
+	// trim slash from machine names
+	for i, machine := range machines {
+		machines[i] = strings.TrimSuffix(machine, "/")
 	}
-	time.Sleep(2 * time.Second)
-	defer resp.Body.Close()
+
+	// return response
+	c.JSON(http.StatusOK, gin.H{
+		"data": []map[string]interface{}{
+			{
+				"machines": machines,
+			},
+		},
+	})
 }

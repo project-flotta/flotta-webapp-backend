@@ -6,5 +6,6 @@ import (
 )
 
 func Init(r *gin.Engine) {
-	r.GET("/leave-session/:session", handlers.HelloServer)
+	r.GET("/", handlers.HelloServer)
+	r.GET("/machines", handlers.ListMachines)
 }
