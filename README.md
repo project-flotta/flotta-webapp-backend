@@ -18,3 +18,8 @@ run the following commands to get started:
 cp .env.example .env
 docker-compose up
 ```
+
+### Some Specifications for the App
+this app is built with the following libraries/packages:
+- [Gin Web framework](https://github.com/gin-gonic/gin/) for api routing
+- [AWS SDK](https://aws.amazon.com/sdk-for-go/) for AWS S3

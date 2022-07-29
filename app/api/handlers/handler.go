@@ -1,15 +1,17 @@
 package handlers
 
 import (
-	"fmt"
+	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 	"os"
 	"time"
 )
 
-func HelloServer(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello, %s!", r.URL.Path[1:])
+func HelloServer(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Hello World",
+	})
 }
 
 func ListMachines() {

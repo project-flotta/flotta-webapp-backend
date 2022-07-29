@@ -5,9 +5,7 @@ import (
 	"github.com/ahmadateya/flotta-webapp-backend/api"
 	"github.com/ahmadateya/flotta-webapp-backend/config"
 	"github.com/ahmadateya/flotta-webapp-backend/pkg/s3"
-	"log"
-	"net/http"
-	"time"
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -22,13 +20,12 @@ func main() {
 	s3Client.ListTopLevelFolders()
 
 	// Start the server
-	r := api.Init()
-
-	srv := &http.Server{
-		Handler:      r,
-		Addr:         fmt.Sprintf("%s:%s", cfg.Server.Host, cfg.Server.Port),
-		WriteTimeout: 15 * time.Second,
-		ReadTimeout:  15 * time.Second,
+	router := gin.New()
+	api.Init(router)
+	err = router.Run(cfg.Server.Port)
+	if err != nil {
+		fmt.Printf("Error Starting the server %v\n", err.Error())
 	}
-	log.Fatal(srv.ListenAndServe())
 }
+
+// commit "using Gin framework instead of Mux and pure http pkg"
