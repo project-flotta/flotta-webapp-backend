@@ -12,14 +12,14 @@ import (
 func main() {
 
 	// read configurations from env file
-	c, _ := config.NewConfig("./config.yaml")
+	cfg, _ := config.NewConfig("./config.yaml")
 
 	// Start the server
 	r := api.Init()
 
 	srv := &http.Server{
 		Handler:      r,
-		Addr:         fmt.Sprintf("%s:%s", c.Server.Host, c.Server.Port),
+		Addr:         fmt.Sprintf("%s:%s", cfg.Server.Host, cfg.Server.Port),
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
