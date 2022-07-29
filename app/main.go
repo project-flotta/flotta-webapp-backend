@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/ahmadateya/flotta-webapp-backend/api"
-	"github.com/ahmadateya/flotta-webapp-backend/helpers"
+	"github.com/ahmadateya/flotta-webapp-backend/config"
 	"log"
 	"net/http"
 	"time"
@@ -12,10 +12,11 @@ import (
 func main() {
 
 	// read configurations from env file
-	c, _ := helpers.NewConfig("./config.yaml")
+	c, _ := config.NewConfig("./config.yaml")
 
 	// Start the server
 	r := api.Init()
+
 	srv := &http.Server{
 		Handler:      r,
 		Addr:         fmt.Sprintf("%s:%s", c.Server.Host, c.Server.Port),
