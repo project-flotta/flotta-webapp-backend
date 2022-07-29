@@ -1,4 +1,4 @@
-package storage
+package s3
 
 import (
 	"context"
@@ -14,8 +14,8 @@ type S3 struct {
 	awsClient *s3.Client
 }
 
-// configS3 creates the S3 client
-func initS3Client() S3 {
+// InitS3Client initializes the S3 client
+func InitS3Client() S3 {
 	// read configurations from env file
 	cfg, _ := config.NewConfig("./config.yaml")
 
@@ -37,32 +37,30 @@ func initS3Client() S3 {
 	}
 }
 
-// ListS3TopLevelFolders returns the list of top level folders in the S3 bucket
+// ListTopLevelFolders returns the list of top level folders in the S3 bucket
 // Top Level folders is supposed to represent the machines registered in Flotta
-func (s *S3) ListS3TopLevelFolders() {
-	cfg, _ := config.NewConfig("./config.yaml")
-
-	input := &s3.ListObjectsV2Input{
-		Bucket: &cfg.Storage.S3.Bucket,
+func (s *S3) ListTopLevelFolders() []string {
+	cfg, err := config.NewConfig("./config.yaml")
+	if err != nil {
+		fmt.Printf("Error reading config file : %v", err)
 	}
 
-	resp, err := s.awsClient.ListObjectsV2(context.TODO(), input)
+	delimiter := "/"
+	resp, err := s.awsClient.ListObjectsV2(
+		context.TODO(),
+		&s3.ListObjectsV2Input{
+			Bucket:    &cfg.Storage.S3.Bucket,
+			Delimiter: &delimiter,
+		})
 
 	if err != nil {
 		fmt.Printf("Got error retrieving list of objects: %v\n", err)
-		return
 	}
 
-	fmt.Printf("############### resp %v\n", resp)
+	topLevelFolders := make([]string, 0)
+	for _, obj := range resp.CommonPrefixes {
+		topLevelFolders = append(topLevelFolders, *obj.Prefix)
+	}
 
-	//for _, item := range resp.Contents {
-	//	fmt.Println("Name:          ", *item.Key)
-	//	fmt.Println("Last modified: ", *item.LastModified)
-	//	fmt.Println("Size:          ", item.Size)
-	//	fmt.Println("Storage class: ", item.StorageClass)
-	//	fmt.Println("")
-	//}
-	//
-	//fmt.Println("Found", len(resp.Contents), "items in bucket", *bucket)
-	//fmt.Println("")
+	return topLevelFolders
 }
