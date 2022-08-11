@@ -8,12 +8,6 @@ import (
 	"strings"
 )
 
-func HelloServer(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Hello World",
-	})
-}
-
 func ListDevices(c *gin.Context) {
 	// get machine names from S3 top level folders
 	client := s3.InitS3Client()
@@ -26,11 +20,7 @@ func ListDevices(c *gin.Context) {
 
 	// return response
 	c.JSON(http.StatusOK, gin.H{
-		"data": []map[string]interface{}{
-			{
-				"devices": devices,
-			},
-		},
+		"data": devices,
 	})
 }
 

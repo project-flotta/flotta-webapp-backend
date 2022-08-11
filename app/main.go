@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/ahmadateya/flotta-webapp-backend/api"
 	"github.com/ahmadateya/flotta-webapp-backend/config"
-	"github.com/ahmadateya/flotta-webapp-backend/pkg/s3"
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,9 +14,6 @@ func main() {
 	if err != nil {
 		fmt.Printf("Error reading config file : %v", err)
 	}
-
-	s3Client := s3.InitS3Client()
-	s3Client.ListTopLevelFolders()
 
 	// Start the server
 	router := gin.New()
