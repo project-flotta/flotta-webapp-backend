@@ -1,7 +1,7 @@
-package api
+package devices
 
 import (
-	"github.com/ahmadateya/flotta-webapp-backend/api/handlers"
+	"github.com/ahmadateya/flotta-webapp-backend/pkg/s3"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -10,17 +10,22 @@ func Init(r *gin.Engine) {
 	// use cors middleware to allow cross-origin requests
 	r.Use(CORSMiddleware())
 
-	// Initialize the App Routes
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "Hello World!",
 		})
 	})
 
-	r.GET("/devices", handlers.ListDevices)
-	r.GET("/devices/:device", handlers.GetNetworkTopologyData)
+	// init device routes
+	h := Handler{
+		S3: s3.InitS3Client(),
+	}
+	r.GET("/devices", h.ListDevices)
+	r.GET("/devices/:device", h.GetNetworkTopologyData)
 }
 
+// CORSMiddleware returns a middleware handler that adds proper CORS headers to each request.
+// this could be moved to a separate package if it is used in other places
 func CORSMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")

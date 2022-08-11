@@ -1,4 +1,4 @@
-package handlers
+package devices
 
 import (
 	"encoding/json"
@@ -8,10 +8,13 @@ import (
 	"strings"
 )
 
-func ListDevices(c *gin.Context) {
+type Handler struct {
+	S3 s3.S3
+}
+
+func (h *Handler) ListDevices(c *gin.Context) {
 	// get machine names from S3 top level folders
-	client := s3.InitS3Client()
-	devices := client.ListTopLevelFolders()
+	devices := h.S3.ListTopLevelFolders()
 
 	// trim slash from machine names
 	for i, device := range devices {
@@ -24,12 +27,12 @@ func ListDevices(c *gin.Context) {
 	})
 }
 
-func GetNetworkTopologyData(c *gin.Context) {
+func (h *Handler) GetNetworkTopologyData(c *gin.Context) {
 	device := c.Param("device")
 
 	// get network topology data from S3
 	client := s3.InitS3Client()
-	networkTopologyFilename := client.GetMostRecentObjectNameInFolder(device)
+	networkTopologyFilename := h.S3.GetMostRecentObjectNameInFolder(device)
 
 	// if the machine does not have any network data yet, return error
 	if networkTopologyFilename == "" {
