@@ -65,7 +65,7 @@ func (s *S3) ListTopLevelFolders() []string {
 	return topLevelFolders
 }
 
-func (s *S3) GetMostRecentObjectNameInFolder(folder string) string {
+func (s *S3) GetMostRecentObjectNameInFolder(folder string) (string, error) {
 	folderPath := folder + "/"
 	resp, err := s.awsClient.ListObjectsV2(
 		context.TODO(),
@@ -75,17 +75,17 @@ func (s *S3) GetMostRecentObjectNameInFolder(folder string) string {
 		})
 
 	if err != nil {
-		fmt.Printf("Got error retrieving list of objects: %v\n", err)
+		return "", fmt.Errorf("Got error retrieving list of objects: %v\n", err)
 	}
 
 	if len(resp.Contents) > 0 {
-		return *resp.Contents[1].Key
+		return *resp.Contents[1].Key, nil
 	}
 
-	return ""
+	return "", fmt.Errorf("no object found in folder %s", folder)
 }
 
-func (s *S3) ReadObject(objectPath string) string {
+func (s *S3) ReadObject(objectPath string) (string, error) {
 	input := &s3.GetObjectInput{
 		Bucket: &s.bucket,
 		Key:    &objectPath,
@@ -93,13 +93,13 @@ func (s *S3) ReadObject(objectPath string) string {
 
 	resp, err := s.awsClient.GetObject(context.TODO(), input)
 	if err != nil {
-		fmt.Printf("Got error retrieving object: %v\n", err)
+		return "", fmt.Errorf("Got error retrieving object: %v\n", err)
 	}
 	defer resp.Body.Close()
 
 	objContent, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Println(err)
+		return "", fmt.Errorf("Got error retrieving object: %v\n", err)
 	}
-	return fmt.Sprintf("%s", objContent)
+	return fmt.Sprintf("%s", objContent), nil
 }

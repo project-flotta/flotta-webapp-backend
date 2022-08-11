@@ -2,6 +2,8 @@ package devices
 
 import (
 	"encoding/json"
+	"fmt"
+	"github.com/ahmadateya/flotta-webapp-backend/helpers"
 	"github.com/ahmadateya/flotta-webapp-backend/pkg/s3"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -27,30 +29,33 @@ func (h *Handler) ListDevices(c *gin.Context) {
 	})
 }
 
-func (h *Handler) GetNetworkTopologyData(c *gin.Context) {
+func (h *Handler) GetNetworkData(c *gin.Context) {
 	device := c.Param("device")
 
 	// get network topology data from S3
 	client := s3.InitS3Client()
-	networkTopologyFilename := h.S3.GetMostRecentObjectNameInFolder(device)
-
-	// if the machine does not have any network data yet, return error
-	if networkTopologyFilename == "" {
-		c.JSON(http.StatusNotFound, gin.H{
-			"errors": []map[string]interface{}{
-				{
-					"status": http.StatusNotFound,
-					"title":  "no network topology data found",
-					"detail": "no network topology data found for device " + device,
-				},
-			},
-		})
+	networkTopologyFilename, err := h.S3.GetMostRecentObjectNameInFolder(device + "/network")
+	if err != nil {
+		helpers.FormatErrorMessage(c,
+			http.StatusNotFound,
+			"error getting network data",
+			err.Error(),
+		)
 		return
 	}
 
 	// read contents of network topology file from S3
-	objContent := client.ReadObject(networkTopologyFilename)
+	objContent, err := client.ReadObject(device + "/" + networkTopologyFilename)
+	if err != nil {
+		helpers.FormatErrorMessage(c,
+			http.StatusNotFound,
+			"error getting network data",
+			err.Error(),
+		)
+		return
+	}
 
+	fmt.Printf("=================== objContent: %s\n", objContent)
 	// parse objContent data to JSON
 	var jsonMap map[string]interface{}
 	json.Unmarshal([]byte(objContent), &jsonMap)

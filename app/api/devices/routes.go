@@ -21,7 +21,7 @@ func Init(r *gin.Engine) {
 		S3: s3.InitS3Client(),
 	}
 	r.GET("/devices", h.ListDevices)
-	r.GET("/devices/:device", h.GetNetworkTopologyData)
+	r.GET("/devices/:device/network", h.GetNetworkData)
 }
 
 // CORSMiddleware returns a middleware handler that adds proper CORS headers to each request.
