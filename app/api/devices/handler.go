@@ -44,8 +44,20 @@ func (h *Handler) GetNetworkData(c *gin.Context) {
 		return
 	}
 
+	// download network topology file from S3
+	filename := networkTopologyFilename[strings.LastIndex(networkTopologyFilename, "/")+1:]
+	err = h.S3.DownloadObject(filename, networkTopologyFilename)
+	if err != nil {
+		helpers.FormatErrorMessage(c,
+			http.StatusNotFound,
+			"error getting network data",
+			err.Error(),
+		)
+		return
+	}
+
 	// read contents of network topology file from S3
-	objContent, err := client.ReadObject(device + "/" + networkTopologyFilename)
+	objContent, err := client.ReadObject(networkTopologyFilename)
 	if err != nil {
 		helpers.FormatErrorMessage(c,
 			http.StatusNotFound,
