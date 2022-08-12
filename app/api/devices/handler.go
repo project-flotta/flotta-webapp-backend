@@ -27,11 +27,11 @@ func (h *Handler) ListDevices(c *gin.Context) {
 	})
 }
 
-func (h *Handler) GetNetworkData(c *gin.Context) {
+func (h *Handler) GetDeviceData(c *gin.Context) {
 	device := c.Param("device")
 
-	// get network topology data from S3
-	networkTopologyFilename, err := h.S3.GetMostRecentObjectNameInFolder(device + "/network")
+	// download network log file from S3
+	err := h.downloadLogFile(device + "/network")
 	if err != nil {
 		helpers.FormatErrorMessage(c,
 			http.StatusInternalServerError,
@@ -41,36 +41,34 @@ func (h *Handler) GetNetworkData(c *gin.Context) {
 		return
 	}
 
-	// download network topology file from S3
-	//filename := networkTopologyFilename[strings.LastIndex(networkTopologyFilename, "/")+1:]
-	err = h.S3.DownloadObject(networkTopologyFilename)
+	// download cputemp log file from S3
+	err = h.downloadLogFile(device + "/cputemp")
 	if err != nil {
 		helpers.FormatErrorMessage(c,
 			http.StatusInternalServerError,
-			"error getting network data",
+			"error getting CPU temperature data",
 			err.Error(),
 		)
 		return
 	}
-
-	// read contents of network topology file from S3
-	//objContent, err := client.ReadObject(networkTopologyFilename)
-	//if err != nil {
-	//	helpers.FormatErrorMessage(c,
-	//		http.StatusNotFound,
-	//		"error getting network data",
-	//		err.Error(),
-	//	)
-	//	return
-	//}
-
-	//fmt.Printf("=================== objContent: %s\n", objContent)
-	//// parse objContent data to JSON
-	//var jsonMap map[string]interface{}
-	//json.Unmarshal([]byte(objContent), &jsonMap)
 
 	// return response
 	c.JSON(http.StatusOK, gin.H{
-		"data": "jsonMap",
+		"data": "success",
 	})
+}
+
+func (h *Handler) downloadLogFile(device string) error {
+	// get latest object in folder from S3
+	filename, err := h.S3.GetMostRecentObjectNameInFolder(device)
+	if err != nil {
+		return err
+	}
+
+	// download file from S3
+	err = h.S3.DownloadObject(filename)
+	if err != nil {
+		return err
+	}
+	return nil
 }
