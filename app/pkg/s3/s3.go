@@ -2,13 +2,16 @@ package s3
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/ahmadateya/flotta-webapp-backend/config"
 	awsConfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
+	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"io/ioutil"
 	"log"
+	"os"
 )
 
 // This package is used to encapsulate the S3 treatment
@@ -102,4 +105,36 @@ func (s *S3) ReadObject(objectPath string) (string, error) {
 		return "", fmt.Errorf("Got error retrieving object: %v\n", err)
 	}
 	return fmt.Sprintf("%s", objContent), nil
+}
+
+func (s *S3) DownloadObject(objectName, objectPath string) error {
+	// check if the object exists in local filesystem
+	if _, err := os.Stat("./tmp/" + objectName); err == nil {
+		return nil
+	} else if errors.Is(err, os.ErrNotExist) {
+		return s.downloadObject(objectName, objectPath)
+	} else {
+		return fmt.Errorf("got checking if file exist: %v\n", err)
+	}
+}
+
+func (s *S3) downloadObject(objectName, objectPath string) error {
+	downloadFile, err := os.Create("./tmp/" + objectName)
+	if err != nil {
+		return fmt.Errorf("got errot creating a file: %v\n", err)
+	}
+	defer downloadFile.Close()
+
+	downloader := manager.NewDownloader(s.awsClient)
+	_, err = downloader.Download(context.TODO(),
+		downloadFile,
+		&s3.GetObjectInput{
+			Bucket: &s.bucket,
+			Key:    &objectPath,
+		})
+
+	if err != nil {
+		return fmt.Errorf("got error downloading object: %v\n", err)
+	}
+	return nil
 }
