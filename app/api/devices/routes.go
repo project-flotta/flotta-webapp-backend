@@ -22,7 +22,7 @@ func Init(r *gin.Engine) {
 	}
 	r.GET("/devices", h.ListDevices)
 	r.GET("/devices/:device", h.GetDeviceData)
-	//r.GET("/devices/:device/network", h.GetNetworkData)
+	r.GET("/devices/:device/network", h.GetNetworkData)
 }
 
 // CORSMiddleware returns a middleware handler that adds proper CORS headers to each request.

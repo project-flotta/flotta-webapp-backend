@@ -2,6 +2,7 @@ package devices
 
 import (
 	"github.com/ahmadateya/flotta-webapp-backend/helpers"
+	"github.com/ahmadateya/flotta-webapp-backend/pkg/logparser"
 	"github.com/ahmadateya/flotta-webapp-backend/pkg/s3"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -49,6 +50,26 @@ func (h *Handler) GetDeviceData(c *gin.Context) {
 			"error getting CPU temperature data",
 			err.Error(),
 		)
+		return
+	}
+
+	// return response
+	c.JSON(http.StatusOK, gin.H{
+		"data": "success",
+	})
+}
+
+func (h *Handler) GetNetworkData(c *gin.Context) {
+	device := c.Param("device")
+	// number of lines to read from log file
+	lines := c.Query("lines")
+	if lines == "" {
+		lines = "5"
+	}
+
+	// read number of line n from the end of log file
+	_, err := logparser.ReadLogFileRaw(device+"/network", lines)
+	if err != nil {
 		return
 	}
 
