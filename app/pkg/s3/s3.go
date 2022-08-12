@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/ahmadateya/flotta-webapp-backend/config"
+	"github.com/ahmadateya/flotta-webapp-backend/helpers"
 	awsConfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
@@ -107,21 +108,29 @@ func (s *S3) ReadObject(objectPath string) (string, error) {
 	return fmt.Sprintf("%s", objContent), nil
 }
 
-func (s *S3) DownloadObject(objectName, objectPath string) error {
+func (s *S3) DownloadObject(objectPath string) error {
 	// check if the object exists in local filesystem
-	if _, err := os.Stat("./tmp/" + objectName); err == nil {
+	if _, err := os.Stat("./tmp/" + objectPath); err == nil {
 		return nil
 	} else if errors.Is(err, os.ErrNotExist) {
-		return s.downloadObject(objectName, objectPath)
+		return s.downloadObject(objectPath)
 	} else {
 		return fmt.Errorf("got checking if file exist: %v\n", err)
 	}
 }
 
-func (s *S3) downloadObject(objectName, objectPath string) error {
-	downloadFile, err := os.Create("./tmp/" + objectName)
+func (s *S3) downloadObject(objectPath string) error {
+	_, dir := helpers.SplitFilenameAndDir(objectPath)
+	// create the folder if it doesn't exist
+	err := os.MkdirAll("./tmp/"+dir, os.ModePerm)
 	if err != nil {
-		return fmt.Errorf("got errot creating a file: %v\n", err)
+		return fmt.Errorf("got error creating directory: %v\n", err)
+	}
+
+	// create the file if it doesn't exist
+	downloadFile, err := os.Create("./tmp/" + objectPath)
+	if err != nil {
+		return fmt.Errorf("got error creating a file: %v\n", err)
 	}
 	defer downloadFile.Close()
 

@@ -1,6 +1,9 @@
 package helpers
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	"strings"
+)
 
 func FormatErrorMessage(c *gin.Context, status int, title, detail string) {
 	c.JSON(status, gin.H{
@@ -12,4 +15,9 @@ func FormatErrorMessage(c *gin.Context, status int, title, detail string) {
 			},
 		},
 	})
+}
+
+// SplitFilenameAndDir returns the filename and directory (in order) of a given path
+func SplitFilenameAndDir(path string) (string, string) {
+	return path[strings.LastIndex(path, "/")+1:], path[:strings.LastIndex(path, "/")]
 }

@@ -1,8 +1,6 @@
 package devices
 
 import (
-	"encoding/json"
-	"fmt"
 	"github.com/ahmadateya/flotta-webapp-backend/helpers"
 	"github.com/ahmadateya/flotta-webapp-backend/pkg/s3"
 	"github.com/gin-gonic/gin"
@@ -33,11 +31,10 @@ func (h *Handler) GetNetworkData(c *gin.Context) {
 	device := c.Param("device")
 
 	// get network topology data from S3
-	client := s3.InitS3Client()
 	networkTopologyFilename, err := h.S3.GetMostRecentObjectNameInFolder(device + "/network")
 	if err != nil {
 		helpers.FormatErrorMessage(c,
-			http.StatusNotFound,
+			http.StatusInternalServerError,
 			"error getting network data",
 			err.Error(),
 		)
@@ -45,11 +42,11 @@ func (h *Handler) GetNetworkData(c *gin.Context) {
 	}
 
 	// download network topology file from S3
-	filename := networkTopologyFilename[strings.LastIndex(networkTopologyFilename, "/")+1:]
-	err = h.S3.DownloadObject(filename, networkTopologyFilename)
+	//filename := networkTopologyFilename[strings.LastIndex(networkTopologyFilename, "/")+1:]
+	err = h.S3.DownloadObject(networkTopologyFilename)
 	if err != nil {
 		helpers.FormatErrorMessage(c,
-			http.StatusNotFound,
+			http.StatusInternalServerError,
 			"error getting network data",
 			err.Error(),
 		)
@@ -57,23 +54,23 @@ func (h *Handler) GetNetworkData(c *gin.Context) {
 	}
 
 	// read contents of network topology file from S3
-	objContent, err := client.ReadObject(networkTopologyFilename)
-	if err != nil {
-		helpers.FormatErrorMessage(c,
-			http.StatusNotFound,
-			"error getting network data",
-			err.Error(),
-		)
-		return
-	}
+	//objContent, err := client.ReadObject(networkTopologyFilename)
+	//if err != nil {
+	//	helpers.FormatErrorMessage(c,
+	//		http.StatusNotFound,
+	//		"error getting network data",
+	//		err.Error(),
+	//	)
+	//	return
+	//}
 
-	fmt.Printf("=================== objContent: %s\n", objContent)
-	// parse objContent data to JSON
-	var jsonMap map[string]interface{}
-	json.Unmarshal([]byte(objContent), &jsonMap)
+	//fmt.Printf("=================== objContent: %s\n", objContent)
+	//// parse objContent data to JSON
+	//var jsonMap map[string]interface{}
+	//json.Unmarshal([]byte(objContent), &jsonMap)
 
 	// return response
 	c.JSON(http.StatusOK, gin.H{
-		"data": jsonMap,
+		"data": "jsonMap",
 	})
 }
