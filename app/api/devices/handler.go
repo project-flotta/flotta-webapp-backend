@@ -68,14 +68,29 @@ func (h *Handler) GetNetworkData(c *gin.Context) {
 	}
 
 	// read number of line n from the end of log file
-	_, err := logparser.ReadLogFileRaw(device+"/network", lines)
+	raw, err := logparser.ReadLogFileRaw(device+"/network", lines)
 	if err != nil {
+		helpers.FormatErrorMessage(c,
+			http.StatusInternalServerError,
+			"error reading network data",
+			err.Error(),
+		)
+		return
+	}
+	// parse raw log file into proper structs
+	netData, err := logparser.ParseRawLines(raw)
+	if err != nil {
+		helpers.FormatErrorMessage(c,
+			http.StatusInternalServerError,
+			"error parsing network data",
+			err.Error(),
+		)
 		return
 	}
 
 	// return response
 	c.JSON(http.StatusOK, gin.H{
-		"data": "success",
+		"data": netData,
 	})
 }
 

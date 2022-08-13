@@ -1,11 +1,8 @@
 package logparser
 
 import (
-	"bufio"
-	"bytes"
 	"fmt"
 	"io/ioutil"
-	"os"
 	"os/exec"
 	"sort"
 )
@@ -23,7 +20,7 @@ func ReadLogFileRaw(dirPath, lines string) (string, error) {
 	fullPath := LogDir + dirPath + "/" + file
 
 	// read number of line n from the end of log file
-	cmd := exec.Command("tail", "-S", "-n", lines, fullPath)
+	cmd := exec.Command("tail", "-n", lines, fullPath)
 	res, err := cmd.CombinedOutput()
 	if err != nil {
 		return "", fmt.Errorf("error executing tail command: %v", err.Error())
@@ -50,33 +47,14 @@ func getLatestModifiedFile(dir string) (string, error) {
 	return files[0].Name(), nil
 }
 
-func Parse() {
-	lines, requestA := 0, 0
-	f, err := os.Open("request.log")
-	if err != nil {
-		fmt.Print("There has been an error!: ", err)
-	}
-	defer f.Close()
-
-	scanner := bufio.NewScanner(f)
-	for scanner.Scan() {
-		lines++
-		// filter request a
-		line := scanner.Bytes()
-		if len(line) <= 30 || line[30] != 'A' {
-			continue
+func convertAddressToString(i []interface{}) string {
+	var s string
+	for index, v := range i {
+		if index == len(i)-1 {
+			s += fmt.Sprintf("%v", v)
+		} else {
+			s += fmt.Sprintf("%v.", v)
 		}
-		if !bytes.Equal(line[22:], []byte("REQUEST-A")) {
-			continue
-		}
-		requestA++
-		request := string(line)
-
-		// handle request a
-		fmt.Println(request)
 	}
-	if err := scanner.Err(); err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(lines, requestA)
+	return s
 }
