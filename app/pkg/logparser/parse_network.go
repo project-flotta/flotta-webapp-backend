@@ -28,7 +28,7 @@ type Hop struct {
 	TTL         float64       `json:"ttl"`
 }
 
-func ParseRawLines(raw string) ([]NetworkParsedLine, error) {
+func ParseNetworkRawLines(raw string) ([]NetworkParsedLine, error) {
 	// split raw string into lines
 	linesRegex := regexp.MustCompile("\n")
 	lines := linesRegex.Split(raw, -1)
@@ -38,7 +38,7 @@ func ParseRawLines(raw string) ([]NetworkParsedLine, error) {
 		// split raw string into date, time and data
 		if len(l) > 0 {
 			lineData := strings.Split(l, " ")
-			parsedLine, err := parseSingleLine(lineData)
+			parsedLine, err := parseNetworkSingleLine(lineData)
 			if err != nil {
 				return nil, err
 			}
@@ -48,7 +48,7 @@ func ParseRawLines(raw string) ([]NetworkParsedLine, error) {
 	return parsedLines, nil
 }
 
-func parseSingleLine(lineData []string) (NetworkParsedLine, error) {
+func parseNetworkSingleLine(lineData []string) (NetworkParsedLine, error) {
 	var parsedLine NetworkParsedLine
 	var netData map[string]interface{}
 	var err error
