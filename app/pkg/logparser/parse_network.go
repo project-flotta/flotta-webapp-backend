@@ -3,6 +3,7 @@ package logparser
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/google/uuid"
 	"regexp"
 	"strings"
 	"time"
@@ -21,6 +22,7 @@ type NetworkData struct {
 
 type Hop struct {
 	Success     bool          `json:"success"`
+	Uuid        string        `json:"uuid"`
 	Address     string        `json:"address"`
 	Host        string        `json:"host"`
 	N           float64       `json:"n"`
@@ -81,5 +83,6 @@ func fillHopDataIntoStruct(hopData map[string]interface{}) Hop {
 	hop.N = hopData["N"].(float64)
 	hop.ElapsedTime = time.Duration(hopData["ElapsedTime"].(float64))
 	hop.TTL = hopData["TTL"].(float64)
+	hop.Uuid = uuid.New().String()
 	return hop
 }
