@@ -2,26 +2,25 @@ package main
 
 import (
 	"fmt"
-	"github.com/ahmadateya/flotta-webapp-backend/api"
+	"github.com/ahmadateya/flotta-webapp-backend/api/devices"
 	"github.com/ahmadateya/flotta-webapp-backend/config"
-	"log"
-	"net/http"
-	"time"
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
 
 	// read configurations from env file
-	c, _ := config.NewConfig("./config.yaml")
+	cfg, err := config.NewConfig("./config.yaml")
+	if err != nil {
+		fmt.Printf("Error reading config file : %v", err)
+	}
 
 	// Start the server
-	r := api.Init()
-
-	srv := &http.Server{
-		Handler:      r,
-		Addr:         fmt.Sprintf("%s:%s", c.Server.Host, c.Server.Port),
-		WriteTimeout: 15 * time.Second,
-		ReadTimeout:  15 * time.Second,
+	router := gin.New()
+	// init devices handler
+	devices.Init(router)
+	err = router.Run(fmt.Sprintf("%s:%s", cfg.Server.Host, cfg.Server.Port))
+	if err != nil {
+		fmt.Printf("Error Starting the server %v\n", err.Error())
 	}
-	log.Fatal(srv.ListenAndServe())
 }

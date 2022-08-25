@@ -6,12 +6,24 @@ import (
 )
 
 type Config struct {
-	Server Server
+	Server  Server
+	Storage Storage
 }
 
 type Server struct {
 	Host string
 	Port string
+}
+
+type Storage struct {
+	S3 S3
+}
+
+type S3 struct {
+	AccessKeyId     string `yaml:"accessKeyId"`
+	SecretAccessKey string `yaml:"secretAccessKey"`
+	Region          string `yaml:"region"`
+	Bucket          string `yaml:"bucket"`
 }
 
 // NewConfig returns a new decoded Config struct
