@@ -17,7 +17,7 @@ func (h *Handler) GetNetworkData(c *gin.Context) {
 	}
 
 	// read number of line n from the end of log file
-	raw, err := logparser.ReadLogFileRaw(device+"/network", numOfLines)
+	raw, err := logparser.ReadLogFileRaw(logparser.LogDir+device+"/network", numOfLines)
 	if err != nil {
 		helpers.FormatErrorMessage(c,
 			http.StatusInternalServerError,

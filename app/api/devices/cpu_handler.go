@@ -17,7 +17,7 @@ func (h *Handler) GetCPUTempData(c *gin.Context) {
 	}
 
 	// read number of line n from the end of log file
-	raw, err := logparser.ReadLogFileRaw(device+"/cputemp", lines)
+	raw, err := logparser.ReadLogFileRaw(logparser.LogDir+device+"/cputemp", lines)
 	if err != nil {
 		helpers.FormatErrorMessage(c,
 			http.StatusInternalServerError,

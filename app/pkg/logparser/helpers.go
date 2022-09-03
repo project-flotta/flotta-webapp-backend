@@ -11,13 +11,13 @@ const LogDir = "./tmp/"
 
 func ReadLogFileRaw(dirPath, lines string) (string, error) {
 	// list files in directory to get the latest file
-	file, err := getLatestModifiedFile(LogDir + dirPath)
+	file, err := getLatestModifiedFile(dirPath)
 	if err != nil {
 		return "", fmt.Errorf("error getting latest modified file: %v", err.Error())
 	}
 
 	// full path to log file
-	fullPath := LogDir + dirPath + "/" + file
+	fullPath := dirPath + "/" + file
 
 	// read number of line n from the end of log file
 	cmd := exec.Command("tail", "-n", lines, fullPath)
