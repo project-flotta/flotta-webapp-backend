@@ -9,6 +9,9 @@ import (
 var HoursInDay = []string{"00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"}
 
 func GetCPUAvgTempOverTheDay(logLines []logparser.CPUTempParsedLine) ([]string, error) {
+	if len(logLines) == 0 {
+		return nil, fmt.Errorf("cant get avg temp over the day, log lines is empty")
+	}
 	// get the first date in the data
 	firstDate := logLines[0].LogDate
 	// collect all temp data in the same day in a map with key as the hour of the day
