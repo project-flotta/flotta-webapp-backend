@@ -2,6 +2,7 @@ package devices
 
 import (
 	"github.com/ahmadateya/flotta-webapp-backend/helpers"
+	"github.com/ahmadateya/flotta-webapp-backend/pkg/analysis"
 	"github.com/ahmadateya/flotta-webapp-backend/pkg/logparser"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -12,7 +13,7 @@ func (h *Handler) GetCPUTempData(c *gin.Context) {
 	// number of lines to read from log file
 	lines := c.Query("lines")
 	if lines == "" {
-		lines = "5"
+		lines = "50"
 	}
 
 	// read number of line n from the end of log file
@@ -26,7 +27,7 @@ func (h *Handler) GetCPUTempData(c *gin.Context) {
 		return
 	}
 	// parse raw log file into proper structs
-	cpuData, err := logparser.ParseCPUTempRawLines(raw)
+	parsedData, err := logparser.ParseCPUTempRawLines(raw)
 	if err != nil {
 		helpers.FormatErrorMessage(c,
 			http.StatusInternalServerError,
@@ -36,8 +37,22 @@ func (h *Handler) GetCPUTempData(c *gin.Context) {
 		return
 	}
 
+	// analyze the data to get insights
+	cpuData, err := analysis.GetCPUAvgTempOverTheDay(parsedData)
+	if err != nil {
+		helpers.FormatErrorMessage(c,
+			http.StatusInternalServerError,
+			"error analyze temp data",
+			err.Error(),
+		)
+		return
+	}
+
 	// return response
 	c.JSON(http.StatusOK, gin.H{
-		"data": cpuData,
+		"data": map[string]interface{}{
+			"labels":  analysis.HoursInDay,
+			"degrees": cpuData,
+		},
 	})
 }
