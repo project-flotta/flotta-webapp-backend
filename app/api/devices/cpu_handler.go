@@ -6,6 +6,7 @@ import (
 	"github.com/ahmadateya/flotta-webapp-backend/pkg/logparser"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"path/filepath"
 )
 
 func (h *Handler) GetCPUTempData(c *gin.Context) {
@@ -17,7 +18,8 @@ func (h *Handler) GetCPUTempData(c *gin.Context) {
 	}
 
 	// read number of line n from the end of log file
-	raw, err := logparser.ReadLogFileRaw(logparser.LogDir+device+"/cputemp", lines)
+	path := filepath.Join(logparser.LogDir, device, "cputemp")
+	raw, err := logparser.ReadLogFileRaw(path, lines)
 	if err != nil {
 		helpers.FormatErrorMessage(c,
 			http.StatusInternalServerError,
