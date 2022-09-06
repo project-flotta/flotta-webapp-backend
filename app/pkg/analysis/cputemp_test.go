@@ -1,33 +1,68 @@
 package analysis
 
 import (
+	"fmt"
 	"github.com/ahmadateya/flotta-webapp-backend/pkg/logparser"
+	"github.com/stretchr/testify/assert"
+	"reflect"
 	"testing"
 )
 
 func TestGetCPUAvgTempOverTheDay(t *testing.T) {
-	logLines := []logparser.CPUTempParsedLine{
+	type args struct {
+		raw []logparser.CPUTempParsedLine
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    []string
+		wantErr bool
+	}{
 		{
-			LogDate: "2020-01-01",
-			LogTime: "00:00:00",
-			Data: logparser.CPUTempData{
-				Temp: 50,
+			name: "TestParseCPUTempRawLines",
+			args: args{
+				raw: []logparser.CPUTempParsedLine{
+					{
+						LogDate: "2020-01-01",
+						LogTime: "00:00:00",
+						Data: logparser.CPUTempData{
+							Temp: 50,
+						},
+					},
+					{
+						LogDate: "2020-01-01",
+						LogTime: "00:00:00",
+						Data: logparser.CPUTempData{
+							Temp: 30,
+						},
+					},
+				},
 			},
+			want:    []string{"40.00", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"},
+			wantErr: false,
 		},
 		{
-			LogDate: "2020-01-01",
-			LogTime: "00:00:00",
-			Data: logparser.CPUTempData{
-				Temp: 30,
+			name: "TestParseCPUTempRawLinesWithEmptyData",
+			args: args{
+				raw: []logparser.CPUTempParsedLine{},
 			},
+			want:    nil,
+			wantErr: true,
 		},
 	}
-	avgTemp, _ := GetCPUAvgTempOverTheDay(logLines)
-	if len(avgTemp) != 24 {
-		t.Errorf("Expected 24 avg degrees in day, got %d", len(avgTemp))
-	}
-	if avgTemp[0] != "40.00" {
-		t.Errorf("Expected 40.00 in 00 hour, got %s", avgTemp[0])
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := GetCPUAvgTempOverTheDay(tt.args.raw)
+			if (err != nil) != tt.wantErr {
+				assert.Equal(t, got, 24, fmt.Sprintf("Expected 24 avg degrees in day, got %d", len(got)))
+				t.Errorf("GetCPUAvgTempOverTheDay() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("GetCPUAvgTempOverTheDay() = %v, want %v", got, tt.want)
+			}
+		})
 	}
 }
 
