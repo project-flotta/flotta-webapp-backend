@@ -26,7 +26,7 @@ func TestReadLogFileRaw(t *testing.T) {
 		{
 			name: "TestReadLogFileRaw",
 			args: args{
-				dirPath: "../../tmp/device-name/cputemp",
+				dirPath: "testdata/device-name/cputemp",
 				lines:   "10",
 			},
 			wantErr: false,
@@ -63,7 +63,7 @@ func TestGetLatestModifiedFile(t *testing.T) {
 		{
 			name: "TestGetLatestModifiedFile file exists",
 			args: args{
-				dir: "../../tmp/device-name/cputemp",
+				dir: "testdata/device-name/cputemp",
 			},
 			want:    "cputemp.log",
 			wantErr: false,

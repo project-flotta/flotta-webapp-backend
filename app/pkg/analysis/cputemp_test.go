@@ -56,7 +56,6 @@ func TestGetCPUAvgTempOverTheDay(t *testing.T) {
 			got, err := GetCPUAvgTempOverTheDay(tt.args.raw)
 			if (err != nil) != tt.wantErr {
 				assert.Equal(t, got, 24, fmt.Sprintf("Expected 24 avg degrees in day, got %d", len(got)))
-				t.Errorf("GetCPUAvgTempOverTheDay() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
