@@ -23,3 +23,6 @@ docker-compose up
 this app is built with the following libraries/packages:
 - [Gin Web framework](https://github.com/gin-gonic/gin/) for api routing
 - [AWS SDK](https://aws.amazon.com/sdk-for-go/) for AWS S3
+
+### Future Plans
+- add more tests for the app (s3 package)
