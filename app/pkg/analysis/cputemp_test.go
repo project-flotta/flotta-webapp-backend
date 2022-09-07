@@ -70,30 +70,23 @@ func TestGetAvgTempDataInDay(t *testing.T) {
 		"00": {50, 30},
 	}
 	avgTempDataInDay := getAvgTempDataInDay(tempData)
-	if avgTempDataInDay["00"] != "40.00" {
-		t.Errorf("Expected 40.00, got %s", avgTempDataInDay["00"])
-	}
+	assert.Equal(t, avgTempDataInDay["00"], "40.00", "Expected 40.00, got %s", avgTempDataInDay["00"])
 }
 
 func TestGetAvgTempInHour(t *testing.T) {
 	temps := []float64{50, 50}
 	avgTemp := getAvgTempInHour(temps)
-	if avgTemp != "50.00" {
-		t.Errorf("Expected 50.00, got %s", avgTemp)
-	}
+	assert.Equal(t, avgTemp, "50.00", "Expected 50.00, got %s", avgTemp)
 }
 
 func TestGetTempMapData(t *testing.T) {
 	tempData := getTempMapData()
-	if len(tempData) != 24 {
-		t.Errorf("Expected 24 hours, got %d", len(tempData))
-	}
+	assert.Equal(t, len(tempData), 24, "Expected 24 hours, got %d", len(tempData))
 }
 
 func TestGetCPUAvgTempOverTheDayWithEmptyData(t *testing.T) {
 	var logLines []logparser.CPUTempParsedLine
-	_, err := GetCPUAvgTempOverTheDay(logLines)
-	if err == nil {
-		t.Errorf("Expected error, got %v", err)
-	}
+	nil, err := GetCPUAvgTempOverTheDay(logLines)
+	assert.Equal(t, err, fmt.Errorf("cant get avg temp over the day, log lines is empty"), "Expected empty data error, got %s", err)
+	assert.Equal(t, nil, nil, "Expected nil, got %s", nil)
 }
