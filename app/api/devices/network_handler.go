@@ -2,6 +2,7 @@ package devices
 
 import (
 	"net/http"
+	"path/filepath"
 
 	"github.com/ahmadateya/flotta-webapp-backend/helpers"
 	"github.com/ahmadateya/flotta-webapp-backend/pkg/logparser"
@@ -17,7 +18,8 @@ func (h *Handler) GetNetworkData(c *gin.Context) {
 	}
 
 	// read number of line n from the end of log file
-	raw, err := logparser.ReadLogFileRaw(device+"/network", numOfLines)
+	path := filepath.Join(logparser.LogDir, device, "network")
+	raw, err := logparser.ReadLogFileRaw(path, numOfLines)
 	if err != nil {
 		helpers.FormatErrorMessage(c,
 			http.StatusInternalServerError,
