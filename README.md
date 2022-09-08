@@ -18,3 +18,16 @@ run the following commands to get started:
 cp .env.example .env
 docker-compose up
 ```
+
+Run the following command to run the tests:
+```bash
+make test
+```
+
+### Some Specifications for the App
+this app is built with the following libraries/packages:
+- [Gin Web framework](https://github.com/gin-gonic/gin/) for api routing
+- [AWS SDK](https://aws.amazon.com/sdk-for-go/) for AWS S3
+
+### Future Works
+- add more tests for the app (s3 package)
