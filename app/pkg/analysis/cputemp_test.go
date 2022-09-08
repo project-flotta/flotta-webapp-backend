@@ -86,7 +86,7 @@ func TestGetTempMapData(t *testing.T) {
 
 func TestGetCPUAvgTempOverTheDayWithEmptyData(t *testing.T) {
 	var logLines []logparser.CPUTempParsedLine
-	nil, err := GetCPUAvgTempOverTheDay(logLines)
+	avgTemp, err := GetCPUAvgTempOverTheDay(logLines)
 	assert.Equal(t, err, fmt.Errorf("cant get avg temp over the day, log lines is empty"), "Expected empty data error, got %s", err)
-	assert.Equal(t, nil, nil, "Expected nil, got %s", nil)
+	assert.Nil(t, avgTemp, "Expected nil, got %s", avgTemp)
 }
